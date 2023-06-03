@@ -183,7 +183,11 @@ export default function App() {
         onStateChange={(state) =>
           AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
         }>
-        <Stack.Navigator>
+        <Stack.Navigator
+        // screenOptions={{
+        //   headerShown: false,
+        // }}
+        >
           <Stack.Screen
             name="Home"
             component={HomeScreen}
@@ -202,6 +206,7 @@ export default function App() {
                 headerTitle: EXAMPLES[name].title,
                 title: EXAMPLES[name].title,
                 headerLeft: Platform.OS === 'web' ? BackButton : undefined,
+                ...EXAMPLES[name].options,
               }}
             />
           ))}

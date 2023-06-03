@@ -83,14 +83,24 @@ import WobbleExample from './WobbleExample';
 import WorkletExample from './WorkletExample';
 import ProfilesExample from './SharedElementTransitions/Profiles';
 import VolumeExample from './VolumeExample';
+import RestaurantHome from './RestaurantHome';
 
 interface Example {
   icon?: string;
   title: string;
   screen: React.FC;
+  options?: {};
 }
 
 export const EXAMPLES: Record<string, Example> = {
+  // Restaurant Home
+
+  RestaurantHome: {
+    icon: 'ℹ️',
+    title: 'Restaurant Home',
+    screen: RestaurantHome,
+    options: { headerShown: false },
+  },
   // About
 
   AboutExample: {
