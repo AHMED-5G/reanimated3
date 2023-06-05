@@ -81,7 +81,9 @@
     "@babel/plugin-transform-object-assign": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
     "convert-source-map": "^2.0.0",
-    "invariant": "^2.2.4"
+    "invariant": "^2.2.4",
+    "react-native-redash": "^18.1.0",
+    "react-native-svg": "^13.9.0"
   },
   "peerDependencies": {
     "@babel/core": "^7.0.0-0",
