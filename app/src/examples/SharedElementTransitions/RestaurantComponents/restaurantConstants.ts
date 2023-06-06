@@ -8,8 +8,7 @@ export const { height, width } = Dimensions.get('screen');
 //   damping: 15,
 // };
 const timingOptions = {
-  // duration: 700,
-  //   duration: 500,
+  // duration: 500,
   easing: Easing.bezier(0.54, 0.41, 0.69, 1),
 };
 

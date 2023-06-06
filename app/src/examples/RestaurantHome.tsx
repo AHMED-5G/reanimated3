@@ -58,9 +58,16 @@ function Screen1({ navigation }: NativeStackScreenProps<ParamListBase>) {
   }, [isFocused]);
 
   const homeFadeInProgress = useSharedValue(0);
+  const homeFadeOutProgress = useSharedValue(0);
 
   const homeFadeInRStyle = useAnimatedStyle(() => {
     const toTop = interpolate(homeFadeInProgress.value, [0, 1], [500, 0]);
+    return {
+      top: toTop,
+    };
+  });
+  const topSectionRStyle = useAnimatedStyle(() => {
+    const toTop = interpolate(homeFadeOutProgress.value, [0, 1], [-200, 0]);
     return {
       top: toTop,
     };
@@ -71,17 +78,25 @@ function Screen1({ navigation }: NativeStackScreenProps<ParamListBase>) {
       duration: 700,
       easing: Easing.bezier(0.26, 0.85, 0.62, 0.94),
     });
+    homeFadeOutProgress.value = withTiming(1, {
+      duration: 700,
+      easing: Easing.bezier(0.26, 0.85, 0.62, 0.94),
+    });
   }, []);
+
+  function homeFadeOut() {
+    homeFadeOutProgress.value = withTiming(1);
+  }
 
   return (
     <View style={{ flex: 1 }}>
       <StatusBar backgroundColor={yellowColor} translucent={false} />
       <View style={{ flex: 1 }}>
-        <RestaurantHeader />
-        <View style={{ marginTop: 10 }}>
-          <RestaurantCategories />
-        </View>
-        <Animated.View style={homeFadeInRStyle}>
+        <Animated.View style={topSectionRStyle}>
+          <RestaurantHeader />
+          <View style={{ marginTop: 10 }}>
+            <RestaurantCategories />
+          </View>
           <Animated.View
             entering={FadeInDown.duration(1000)}
             style={{
@@ -92,10 +107,12 @@ function Screen1({ navigation }: NativeStackScreenProps<ParamListBase>) {
             }}>
             <KingSizeBurger />
           </Animated.View>
+        </Animated.View>
+        <Animated.View style={homeFadeInRStyle}>
           <Animated.View
             entering={FadeInDown.duration(1200).overshootClamping(11)}
             style={{ marginLeft: 20, marginTop: 20 }}>
-            <SpecialOffers navigation={navigation} />
+            <SpecialOffers navigation={navigation} homeFadeOut={homeFadeOut} />
           </Animated.View>
         </Animated.View>
       </View>
@@ -254,8 +271,8 @@ function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
     if (openBottomSheetProgress.value > 0) {
       openBottomSheetProgress.value = withTiming(0);
     } else {
-      // navigation.goBack();
-      navigation.push('Screen1');
+      navigation.navigate('Screen1');
+
     }
   }
 
@@ -278,7 +295,7 @@ function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
           imageRStyle,
         ]}>
         <Animated.Image
-          sharedTransitionTag={'Cheese Burger'}
+          sharedTransitionTag={burger.id}
           sharedTransitionStyle={restaurantTransition}
           source={{
             uri: 'https://images.unsplash.com/photo-1603064752734-4c48eff53d05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YnVyZ2VyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',

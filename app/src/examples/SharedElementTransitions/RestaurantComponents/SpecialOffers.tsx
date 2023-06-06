@@ -8,7 +8,13 @@ import {
 } from './restaurantConstants';
 import { specialOffersList } from './data';
 
-const SpecialOffers = ({ navigation }: any) => {
+const SpecialOffers = ({
+  navigation,
+  homeFadeOut,
+}: {
+  navigation: any;
+  homeFadeOut: () => void;
+}) => {
   const [list, setList] = useState(specialOffersList);
 
   return (
@@ -39,8 +45,8 @@ const SpecialOffers = ({ navigation }: any) => {
                 onPress={
                   // () => navigation.navigate('Screen2', { burger: item })
                   () => {
+                    homeFadeOut();
                     navigation.navigate('Screen2', { burger: item });
-                    setList(specialOffersList.reverse());
                   }
                 }>
                 <View
@@ -79,7 +85,7 @@ const SpecialOffers = ({ navigation }: any) => {
                 </View>
                 <Animated.Image
                   sharedTransitionStyle={restaurantTransition}
-                  sharedTransitionTag={item.name}
+                  sharedTransitionTag={item.id}
                   source={{
                     uri: item.image,
                   }}

@@ -10,7 +10,6 @@ import {
 import React, { useRef, useState } from 'react';
 import { easiBezi, height, width, yellowColor } from './restaurantConstants';
 import Animated, {
-  FadeIn,
   FadeInDown,
   SharedValue,
   interpolate,
