@@ -3,7 +3,6 @@ import { Text, TextInput, View } from 'react-native';
 import React from 'react';
 import { BurgerInterface, width, yellowColor } from './restaurantConstants';
 import Animated, {
-  FadeInRight,
   SharedValue,
   interpolate,
   useAnimatedStyle,
@@ -33,7 +32,7 @@ const BurgerInformation = ({
     const toScale = interpolate(
       scalePriceContainerUpProgress.value,
       [0, 1],
-      [1, 1.5]
+      [1, 1.25]
     );
     return {
       transform: [
@@ -52,17 +51,6 @@ const BurgerInformation = ({
         marginTop: 20,
         justifyContent: 'flex-start',
       }}>
-      <View style={{ flex: 1 }}>
-        <Animated.Text
-          style={{ color: 'white', fontSize: 38, fontWeight: 'bold' }}>
-          {burger.name.split(' ')[0]}
-        </Animated.Text>
-        <Animated.Text
-          entering={FadeInRight.duration(1200)}
-          style={{ color: 'white', fontSize: 38, fontWeight: 'bold' }}>
-          {burger.name.split(' ')[1]}
-        </Animated.Text>
-      </View>
       <View style={{ flex: 1, alignItems: 'flex-end' }}>
         <Text
           style={{
@@ -84,7 +72,7 @@ const BurgerInformation = ({
             },
             priceContainerRStyle,
           ]}>
-          <View style={{}}>
+          <View>
             <Text
               style={{
                 color: yellowColor,
@@ -109,7 +97,7 @@ const BurgerInformation = ({
               value={text.value}
               style={{
                 color: yellowColor,
-                fontSize: 38,
+                fontSize: 50,
                 fontWeight: 'bold',
               }}
               animatedProps={integerAnimatedProps}
@@ -118,7 +106,7 @@ const BurgerInformation = ({
           <Text
             style={{
               color: yellowColor,
-              fontSize: 38,
+              fontSize: 40,
               fontWeight: 'bold',
             }}>
             .
@@ -129,7 +117,7 @@ const BurgerInformation = ({
             value={decimalText.value}
             style={{
               color: yellowColor,
-              fontSize: 20,
+              fontSize: 30,
               fontWeight: 'bold',
               marginLeft: -4,
             }}

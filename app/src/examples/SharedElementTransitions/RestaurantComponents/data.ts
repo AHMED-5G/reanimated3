@@ -20,7 +20,7 @@ export const ingredients: IngredientInterface[] = [
     ],
   },
   {
-    name: 'Vegetarian',
+    name: 'Vegetarians',
 
     image: vegetarianImage,
     types: [
@@ -89,13 +89,13 @@ export const specialOffersList: BurgerInterface[] = [
       'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YnVyZ2VyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
     weight: 325,
   },
-  {
-    id: '4',
-    name: 'Cheese Burger',
-    price: 3.15,
-    image:
-      'https://images.unsplash.com/photo-1603064752734-4c48eff53d05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YnVyZ2VyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
+  // {
+  //   id: '4',
+  //   name: 'Cheese Burger',
+  //   price: 3.15,
+  //   image:
+  //     'https://images.unsplash.com/photo-1603064752734-4c48eff53d05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YnVyZ2VyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
 
-    weight: 325,
-  },
+  //   weight: 325,
+  // },
 ];

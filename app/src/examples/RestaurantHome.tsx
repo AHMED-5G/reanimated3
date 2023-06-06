@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Animated, {
   FadeInDown,
   useSharedValue,
@@ -19,9 +19,10 @@ import Animated, {
   withDelay,
   useDerivedValue,
   useAnimatedProps,
-  withSpring,
   FadeIn,
   interpolateColor,
+  FadeInRight,
+  Extrapolate,
 } from 'react-native-reanimated';
 import {
   NativeStackScreenProps,
@@ -36,6 +37,7 @@ import RestaurantNavBar from './SharedElementTransitions/RestaurantComponents/Re
 import { Easing } from 'react-native-reanimated';
 import {
   BurgerInterface,
+  easiBezi,
   easiBeziCounter,
   height,
   restaurantTransition,
@@ -45,14 +47,10 @@ import {
 import SecondScreenHeader from './SharedElementTransitions/RestaurantComponents/SecondScreenHeader';
 import BurgerInformation from './SharedElementTransitions/RestaurantComponents/BurgerInformation';
 import RestaurantBottomSheet from './SharedElementTransitions/RestaurantComponents/RestaurantBottomSheet';
+import RestaurantTopSheet from './SharedElementTransitions/RestaurantComponents/RestayrantTopSheet';
 
 function Screen1({ navigation }: NativeStackScreenProps<ParamListBase>) {
-  // check if screen is focused
   const isFocused = useIsFocused();
-
-  // listen for isFocused, if useFocused changes
-  // call the function that you use to mount the component.
-
   useEffect(() => {
     // isFocused;
   }, [isFocused]);
@@ -120,10 +118,13 @@ function Screen1({ navigation }: NativeStackScreenProps<ParamListBase>) {
     </View>
   );
 }
+
 const initialBottomSheetPercentageOpen = 0.6;
+
 function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
   const { burger } = route.params;
   const openBottomSheetProgress = useSharedValue(0);
+  const openTopSheetProgress = useSharedValue(0);
 
   useEffect(() => {
     openBottomSheetProgress.value = withDelay(
@@ -156,7 +157,7 @@ function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
   const [drivenValue, setDrivenValue] = useState(1);
   const text = useDerivedValue(() => {
     return Math.round(sharedValue.value * Math.floor(price)).toString();
-  });
+  }, [drivenValue]);
 
   useEffect(() => {
     animateDecimalValue(handelDecimalNumber(burger.price));
@@ -169,19 +170,23 @@ function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
   const integerAnimatedProps = useAnimatedProps(() => {
     return { text: text.value } as TextInputProps;
   });
+
   const decimalAnimatedProps = useAnimatedProps(() => {
     return { text: decimalText.value } as TextInputProps;
   });
+
   const [lastCost, setLastCost] = useState(+burger.price);
 
   function setLength(number: number): number {
     return number.toString().length === 2 ? 0.01 : 0.1;
   }
+
   function handelDecimalNumber(number: number): number {
     const value =
       getCurrentDecimalPart(number) * setLength(getCurrentDecimalPart(number));
     return +value;
   }
+
   function animateDecimalValue(number: number) {
     decimalSharedValue.value = withTiming(number * 100, {
       duration: 2000,
@@ -224,28 +229,72 @@ function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
     }
     setLastCost((prev) => prev + newValue);
   }
+
   const scalePriceContainerUpProgress = useSharedValue(0);
-  const scaleUp = () => {
+
+  function scaleUp() {
     scalePriceContainerUpProgress.value = withTiming(
       1,
-      undefined,
+      { duration: 100, easing: easiBezi },
       (isFinished) => {
         if (isFinished) {
-          scalePriceContainerUpProgress.value = withTiming(0);
+          scalePriceContainerUpProgress.value = withTiming(0, {
+            duration: 100,
+            easing: easiBezi,
+          });
         }
       }
     );
-  };
+  }
+
   const addToCartButtonRStyle = useAnimatedStyle(() => {
     const toBackground = interpolateColor(
       openBottomSheetProgress.value,
       [0.2, 0],
       [yellowColor, 'white']
     );
+
     return {
       backgroundColor: toBackground,
     };
   });
+  const scaleButtonProgress = useSharedValue(0);
+
+  const scaleButtonRStyle = useAnimatedStyle(() => {
+    const toScale = interpolate(
+      scaleButtonProgress.value,
+      [0, 1],
+      [1, 0.8],
+      Extrapolate.CLAMP
+    );
+
+    return {
+      transform: [
+        {
+          scale: toScale,
+        },
+      ],
+    };
+  });
+
+  function scaleButton() {
+    scaleButtonProgress.value = withTiming(
+      1,
+      {
+        duration: 100,
+        //  velocity: 10, overshootClamping: false
+      },
+      (isFinished) => {
+        if (isFinished) {
+          scaleButtonProgress.value = withTiming(0, {
+            duration: 100,
+            // velocity: 10,
+            // overshootClamping: false,
+          });
+        }
+      }
+    );
+  }
 
   const GoToMenuTextRStyle = useAnimatedStyle(() => {
     const toOpacity = interpolate(
@@ -257,6 +306,7 @@ function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
       opacity: toOpacity,
     };
   });
+
   const addToCartTextRStyle = useAnimatedStyle(() => {
     const toOpacity = interpolate(
       openBottomSheetProgress.value,
@@ -267,25 +317,101 @@ function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
       opacity: toOpacity,
     };
   });
+
   function handelWhiteYellowActions() {
+    scaleButton();
     if (openBottomSheetProgress.value > 0) {
       openBottomSheetProgress.value = withTiming(0);
+      openTopSheet();
     } else {
       navigation.navigate('Screen1');
-
     }
   }
+
+  function openTopSheet() {
+    openTopSheetProgress.value = withTiming(1, {
+      duration: 1000,
+      easing: easiBeziCounter,
+    });
+  }
+  const burgerNameTextRStyle = useAnimatedStyle(() => {
+    const toColor = interpolateColor(
+      openTopSheetProgress.value,
+      [0.25, 1],
+      ['white', 'black']
+    );
+    const toFontSize = interpolate(
+      openTopSheetProgress.value,
+      [0.25, 1],
+      [38, 28]
+    );
+    return {
+      color: toColor,
+      fontSize: toFontSize,
+    };
+  });
+  const headerRStyle = useAnimatedStyle(() => {
+    const toOpacity = interpolate(
+      openTopSheetProgress.value,
+      [0, 0.25],
+      [1, 0]
+    );
+    return { opacity: toOpacity };
+  });
+  const burgerNameContainerRStyle = useAnimatedStyle(() => {
+    const toTop = interpolate(openTopSheetProgress.value, [0.25, 1], [80, 50]);
+    return {
+      top: toTop,
+    };
+  });
+  const AnimatedToucchable = Animated.createAnimatedComponent(TouchableOpacity);
 
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
       <StatusBar backgroundColor={'black'} />
-      <SecondScreenHeader navigation={navigation} />
-      <BurgerInformation
-        scalePriceContainerUpProgress={scalePriceContainerUpProgress}
-        addValue={addValue}
-        burger={burger as BurgerInterface}
-        {...{ text, decimalText, integerAnimatedProps, decimalAnimatedProps }}
-      />
+
+      <RestaurantTopSheet openTopSheetProgress={openTopSheetProgress} />
+      <Animated.View
+        style={[
+          { position: 'absolute', left: 20, top: 80, zIndex: 1 },
+          burgerNameContainerRStyle,
+        ]}>
+        <Animated.Text
+          style={[
+            { color: 'white', fontSize: 38, fontWeight: 'bold' },
+            burgerNameTextRStyle,
+          ]}>
+          {burger.name.split(' ')[0]}
+        </Animated.Text>
+        <Animated.Text
+          entering={FadeInRight.duration(1200)}
+          style={[
+            { color: 'white', fontSize: 38, fontWeight: 'bold' },
+            burgerNameTextRStyle,
+          ]}>
+          {burger.name.split(' ')[1]}
+        </Animated.Text>
+      </Animated.View>
+      <Animated.View
+        style={[
+          {
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+            opacity: 0,
+          },
+          headerRStyle,
+        ]}>
+        <SecondScreenHeader navigation={navigation} />
+      </Animated.View>
+      <Animated.View style={headerRStyle}>
+        <BurgerInformation
+          scalePriceContainerUpProgress={scalePriceContainerUpProgress}
+          addValue={addValue}
+          burger={burger as BurgerInterface}
+          {...{ text, decimalText, integerAnimatedProps, decimalAnimatedProps }}
+        />
+      </Animated.View>
       <Animated.View
         style={[
           {
@@ -306,6 +432,7 @@ function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
       <View
         style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
         <Animated.View
+          // onPress={() => handelWhiteYellowActions()}
           style={[
             {
               justifyContent: 'center',
@@ -320,48 +447,81 @@ function Screen2({ route, navigation }: NativeStackScreenProps<ParamListBase>) {
               bottom: 15,
             },
             addToCartButtonRStyle,
+            scaleButtonRStyle,
           ]}
           entering={FadeInDown.delay(600).duration(500)}>
-          <Animated.View entering={FadeIn.duration(1000)}>
-            <Animated.View
-              style={[
-                {
-                  position: 'absolute',
-                  top: -15,
-                  left: -50,
-                },
-                addToCartTextRStyle,
-              ]}>
-              <TouchableOpacity
-                style={{}}
-                onPress={() => handelWhiteYellowActions()}>
-                {/* onPress={() => (openBottomSheetProgress.value = withTiming(0))}> */}
-                <Text
-                  style={{ color: 'black', fontWeight: 'bold', fontSize: 22 }}>
-                  Add to cart
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
-            <Animated.View
-              style={[
-                {
-                  position: 'absolute',
-                  top: -15,
-                  left: -50,
-                },
-                GoToMenuTextRStyle,
-              ]}>
-              <TouchableOpacity
-                style={{}}
-                onPress={() => handelWhiteYellowActions()}
-                // onPress={() => navigation.navigate('screen1')}
-              >
-                <Text
-                  style={{ color: 'black', fontWeight: 'bold', fontSize: 22 }}>
-                  Go to menu
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
+          <Animated.View
+            entering={FadeIn.duration(1000)}
+            style={{
+              justifyContent: 'center',
+              alignContent: 'center',
+              alignItems: 'center',
+              width: width * 0.8,
+            }}>
+            <AnimatedToucchable
+              onPress={() => {}}
+              style={{
+                justifyContent: 'center',
+                alignContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    top: -15,
+                    // left: -50,
+                  },
+                  addToCartTextRStyle,
+                ]}>
+                <TouchableOpacity
+                  // disabled
+                  style={{
+                    height: '100%',
+                    width: width * 0.8,
+                    // backgroundColor: yellowColor,
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    alignItems: 'center',
+                  }}
+                  onPress={() => handelWhiteYellowActions()}>
+                  {/* onPress={() => (openBottomSheetProgress.value = withTiming(0))}> */}
+                  <Text
+                    style={{
+                      color: 'black',
+                      fontWeight: 'bold',
+                      fontSize: 22,
+                    }}>
+                    Add to cart
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+              <Animated.View
+                style={[
+                  {
+                    position: 'absolute',
+                    top: -15,
+                    left: -50,
+                  },
+                  GoToMenuTextRStyle,
+                ]}>
+                <TouchableOpacity
+                  style={{}}
+                  // disabled
+                  onPress={() => handelWhiteYellowActions()}
+                  // onPress={() => navigation.navigate('screen1')}
+                >
+                  <Text
+                    style={{
+                      color: 'black',
+                      fontWeight: 'bold',
+                      fontSize: 22,
+                    }}>
+                    Go to menu
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </AnimatedToucchable>
           </Animated.View>
         </Animated.View>
         <RestaurantBottomSheet
