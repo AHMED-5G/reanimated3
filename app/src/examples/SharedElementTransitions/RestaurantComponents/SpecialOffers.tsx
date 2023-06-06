@@ -1,39 +1,15 @@
 import { FlatList, Text, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import Animated from 'react-native-reanimated';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import {
-  BurgerInterface,
   priceBackgroundColor,
   restaurantTransition,
 } from './restaurantConstants';
+import { specialOffersList } from './data';
 
 const SpecialOffers = ({ navigation }: any) => {
-  const specialOffersList: BurgerInterface[] = [
-    {
-      name: 'Cheese Burger',
-      price: 3.15,
-      image:
-        'https://images.unsplash.com/photo-1603064752734-4c48eff53d05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YnVyZ2VyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
-      // image:
-      //   'https://images.unsplash.com/photo-1607013251379-e6eecfffe234?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjN8fGJ1cmdlcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60',
-      weight: 325,
-    },
-    {
-      name: 'BBQ Burger',
-      price: 3.15,
-      image:
-        'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=699&q=80',
-      weight: 325,
-    },
-    {
-      name: 'Hot Burger ',
-      price: 4.6,
-      image:
-        'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YnVyZ2VyfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60',
-      weight: 325,
-    },
-  ];
+  const [list, setList] = useState(specialOffersList);
 
   return (
     <View>
@@ -48,7 +24,7 @@ const SpecialOffers = ({ navigation }: any) => {
       <View style={{ marginTop: 10 }}>
         <FlatList
           horizontal
-          data={specialOffersList}
+          data={list}
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
@@ -60,8 +36,12 @@ const SpecialOffers = ({ navigation }: any) => {
                   overflow: 'hidden',
                 }}
                 activeOpacity={1}
-                onPress={() =>
-                  navigation.navigate('Screen2', { burger: item })
+                onPress={
+                  // () => navigation.navigate('Screen2', { burger: item })
+                  () => {
+                    navigation.navigate('Screen2', { burger: item });
+                    setList(specialOffersList.reverse());
+                  }
                 }>
                 <View
                   style={{
@@ -108,7 +88,7 @@ const SpecialOffers = ({ navigation }: any) => {
               </TouchableOpacity>
             );
           }}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item) => item.id}
           showsHorizontalScrollIndicator={false}
         />
       </View>

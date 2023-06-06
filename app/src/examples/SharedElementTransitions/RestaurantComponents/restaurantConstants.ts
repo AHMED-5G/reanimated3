@@ -24,6 +24,7 @@ export const restaurantTransition = SharedTransition.custom((values) => {
 });
 
 export type BurgerInterface = {
+  id: string;
   name: string;
   price: number;
   image: string;
@@ -31,4 +32,5 @@ export type BurgerInterface = {
 };
 
 export const easiBezi = Easing.bezier(0.26, 0.85, 0.62, 0.94);
+export const easiBeziCounter = Easing.bezier(0.26, 0.85, 0.62, 0.94);
 export const easiBeziCircular = Easing.inOut(Easing.poly(4));

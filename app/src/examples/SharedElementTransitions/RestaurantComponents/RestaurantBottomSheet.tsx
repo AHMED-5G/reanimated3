@@ -10,22 +10,21 @@ import {
 import React, { useRef, useState } from 'react';
 import { easiBezi, height, width, yellowColor } from './restaurantConstants';
 import Animated, {
+  FadeIn,
+  FadeInDown,
   SharedValue,
   interpolate,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import {
-  addImage,
-  cheeseImage,
-  meatImage,
-  onionImage,
-  vegetarianImage,
-} from './Images';
 import CircularProgress from './cirular/circularProgress';
 import IngredientsComponent from './IngredientsComponent';
+import { ingredients } from './data';
 
-type Props = { openBottomSheetProgress: SharedValue<number> };
+type Props = {
+  openBottomSheetProgress: SharedValue<number>;
+  addValue: (number: number) => void;
+};
 export interface IngredientType {
   name: string;
   price: number;
@@ -35,76 +34,22 @@ export interface IngredientInterface {
   image: string;
   types?: IngredientType[];
 }
-const RestaurantBottomSheet = ({ openBottomSheetProgress }: Props) => {
+const RestaurantBottomSheet = ({
+  openBottomSheetProgress,
+  addValue,
+}: Props) => {
   const [selectedIngredient, setSelectedIngredient] =
     useState<IngredientInterface>();
   const bottomSheetRStyle = useAnimatedStyle(() => {
     const toHeight = interpolate(
       openBottomSheetProgress.value,
       [0, 1],
-      [0, height / 2]
+      [0, height / 2 - 10]
     );
-
     return {
       height: toHeight,
     };
   });
-
-  const ingredients: IngredientInterface[] = [
-    {
-      name: 'Onion',
-      image: onionImage,
-      types: [
-        { name: 'Gauda', price: 0.5 },
-        { name: 'Germantas', price: 0.15 },
-        { name: 'Illertaler', price: 0.45 },
-        { name: 'Comte', price: 0.26 },
-      ],
-    },
-    {
-      name: 'Vegetarian',
-
-      image: vegetarianImage,
-      types: [
-        { name: 'Gauda', price: 0.5 },
-        { name: 'Germantas', price: 0.15 },
-        { name: 'Illertaler', price: 0.45 },
-        { name: 'Comte', price: 0.26 },
-      ],
-    },
-    {
-      name: 'Cheese',
-
-      image: cheeseImage,
-      types: [
-        { name: 'Gauda', price: 0.5 },
-        { name: 'Germantas', price: 0.15 },
-        { name: 'Illertaler', price: 0.45 },
-        { name: 'Comte', price: 0.26 },
-      ],
-    },
-    {
-      name: 'Meat',
-
-      image: meatImage,
-      types: [
-        { name: 'Gauda', price: 0.5 },
-        { name: 'Germantas', price: 0.15 },
-        { name: 'Illertaler', price: 0.45 },
-        { name: 'Comte', price: 0.26 },
-      ],
-    },
-    {
-      name: 'Add',
-      image: addImage,
-      types: [
-        { name: 'Gauda', price: 0.5 },
-        { name: 'Germantas', price: 0.15 },
-        { name: 'Illertaler', price: 0.45 },
-        { name: 'Comte', price: 0.26 },
-      ],
-    },
-  ];
 
   const flatListRef = useRef<FlatList | null>(null);
 
@@ -123,7 +68,7 @@ const RestaurantBottomSheet = ({ openBottomSheetProgress }: Props) => {
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          marginTop: 10,
+          marginTop: 5,
         }}>
         <View
           style={{
@@ -161,73 +106,87 @@ const RestaurantBottomSheet = ({ openBottomSheetProgress }: Props) => {
         </View>
       </View>
 
-      <View style={{ marginTop: 20 }}>
+      <Animated.View style={{ marginTop: 10 }}>
         <FlatList
           ref={flatListRef}
           data={ingredients}
           horizontal
           renderItem={({ item, index }) => {
             return (
-              <TouchableOpacity
+              <View
                 style={{
-                  width: 100,
-                  height: 100,
-                  borderRadius: 100,
                   justifyContent: 'center',
                   alignContent: 'center',
                   alignItems: 'center',
                   marginLeft: 20,
-                }}
-                onPress={() => {
-                  setSelectedIngredient(item);
-                  openBottomSheetProgress.value = withTiming(1, {
-                    duration: 500,
-                    easing: easiBezi,
-                  });
-                  flatListRef.current?.scrollToIndex({
-                    animated: true,
-                    index,
-                    viewOffset: 120,
-                  });
                 }}>
-                <View style={{ position: 'absolute' }}>
-                  <CircularProgress
-                    value={selectedIngredient?.name === item.name ? 100 : -1}
-                    activeStrokeColor={
-                      selectedIngredient?.name !== item.name
-                        ? '#EEE'
-                        : yellowColor
-                    }
-                    inActiveStrokeColor="#EEE"
-                    activeStrokeWidth={5}
-                    inActiveStrokeWidth={5}
-                    radius={50}
-                    duration={1000}
-                    progressValueColor={'white'}
-                    maxValue={100}
-                    titleStyle={{ fontWeight: 'bold' }}></CircularProgress>
-                </View>
-
-                <Image
-                  source={item.image as ImageSourcePropType}
-                  style={{ width: 80, height: 80, borderRadius: 100 }}
-                />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: 100,
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    alignItems: 'center',
+                  }}
+                  onPress={() => {
+                    setSelectedIngredient(item);
+                    openBottomSheetProgress.value = withTiming(1, {
+                      duration: 500,
+                      easing: easiBezi,
+                    });
+                    flatListRef.current?.scrollToIndex({
+                      animated: true,
+                      index,
+                      viewOffset: 120,
+                    });
+                  }}>
+                  <View style={{ position: 'absolute' }}>
+                    <CircularProgress
+                      value={selectedIngredient?.name === item.name ? 100 : -1}
+                      activeStrokeColor={
+                        selectedIngredient?.name !== item.name
+                          ? '#EEE'
+                          : yellowColor
+                      }
+                      inActiveStrokeColor="#EEE"
+                      activeStrokeWidth={5}
+                      inActiveStrokeWidth={5}
+                      radius={50}
+                      duration={500}
+                      progressValueColor={'white'}
+                      maxValue={100}
+                      titleStyle={{ fontWeight: 'bold' }}></CircularProgress>
+                  </View>
+                  <Image
+                    resizeMethod="auto"
+                    resizeMode="center"
+                    source={item.image as ImageSourcePropType}
+                    style={{ width: 80, height: 80, borderRadius: 100 }}
+                  />
+                </TouchableOpacity>
+                <Text style={{ color: 'black', fontWeight: '600' }}>
+                  {item.name}
+                </Text>
+              </View>
             );
           }}
           keyExtractor={(item) => item.name}
           showsHorizontalScrollIndicator={false}
         />
-      </View>
-
-      <View style={{ marginTop: 10, marginLeft: 25 }}>
+      </Animated.View>
+      <Animated.View style={{ marginTop: 20, marginLeft: 25 }}>
         <FlatList
           data={selectedIngredient?.types}
-          renderItem={({ item }) => <IngredientsComponent item={item} />}
+          renderItem={({ item, index }) => (
+            <Animated.View entering={FadeInDown.duration(500 * index)}>
+              <IngredientsComponent item={item} addValue={addValue} />
+            </Animated.View>
+          )}
           keyExtractor={(item) => item.name}
           showsHorizontalScrollIndicator={false}
         />
-      </View>
+      </Animated.View>
     </Animated.View>
   );
 };

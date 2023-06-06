@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { width } from './restaurantConstants';
 import { IngredientType } from './RestaurantBottomSheet';
 
-type Props = { item: IngredientType };
+type Props = { item: IngredientType; addValue: (number: number) => void };
 
-const IngredientsComponent = ({ item }: Props) => {
+const IngredientsComponent = ({ item, addValue }: Props) => {
   const [counter, setCounter] = useState(0);
   return (
     <View
@@ -30,7 +30,10 @@ const IngredientsComponent = ({ item }: Props) => {
         </View>
         <TouchableOpacity
           style={styles.plusMinusButtons}
-          onPress={() => setCounter((prev) => prev + 1)}>
+          onPress={() => {
+            setCounter((prev) => prev + 1);
+            addValue(item.price);
+          }}>
           <Text style={styles.plusMinusText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -42,8 +45,8 @@ export default IngredientsComponent;
 
 const styles = StyleSheet.create({
   plusMinusButtons: {
-    width: 50,
-    height: 50,
+    width: 38,
+    height: 38,
     backgroundColor: '#EEE',
     borderRadius: 5,
     justifyContent: 'center',

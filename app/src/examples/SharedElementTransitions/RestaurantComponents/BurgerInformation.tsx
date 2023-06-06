@@ -1,53 +1,48 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Text, TextInput, TextInputProps, View } from 'react-native';
-import React, { useEffect } from 'react';
+import { Text, TextInput, View } from 'react-native';
+import React from 'react';
 import { BurgerInterface, width, yellowColor } from './restaurantConstants';
 import Animated, {
-  Easing,
   FadeInRight,
-  useAnimatedProps,
-  useDerivedValue,
-  useSharedValue,
-  withTiming,
+  SharedValue,
+  interpolate,
+  useAnimatedStyle,
 } from 'react-native-reanimated';
 
 type Props = {
   burger: BurgerInterface;
+  text: Readonly<Animated.SharedValue<string>>;
+  decimalText: Readonly<Animated.SharedValue<string>>;
+  integerAnimatedProps: Partial<{}>;
+  decimalAnimatedProps: Partial<{}>;
+  addValue: (n: number) => void;
+  scalePriceContainerUpProgress: SharedValue<number>;
 };
 
-const BurgerInformation = ({ burger }: Props) => {
+const BurgerInformation = ({
+  burger,
+  text,
+  decimalText,
+  integerAnimatedProps,
+  decimalAnimatedProps,
+  scalePriceContainerUpProgress,
+}: Props) => {
   const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
-  const ref = React.useRef(0);
-  const sv = useSharedValue(0);
-
-  const decimalPart = burger.price.toString().split('.')[1];
-
-  const text = useDerivedValue(() => {
-    return Math.round(sv.value * Math.floor(burger.price)).toString();
+  const priceContainerRStyle = useAnimatedStyle(() => {
+    const toScale = interpolate(
+      scalePriceContainerUpProgress.value,
+      [0, 1],
+      [1, 1.5]
+    );
+    return {
+      transform: [
+        {
+          scale: toScale,
+        },
+      ],
+    };
   });
-  const decimalText = useDerivedValue(() => {
-    return Math.round(sv.value * +decimalPart).toString();
-  });
-
-  const integerAnimatedProps = useAnimatedProps(() => {
-    return { text: text.value } as TextInputProps;
-  });
-  const decimalAnimatedProps = useAnimatedProps(() => {
-    return { text: decimalText.value } as TextInputProps;
-  });
-
-  useEffect(() => {
-    handleToggle();
-  }, []);
-
-  const handleToggle = () => {
-    ref.current = 1 - ref.current;
-    sv.value = withTiming(ref.current, {
-      duration: 2000,
-      easing: Easing.bezier(0.26, 0.85, 0.62, 0.94),
-    });
-  };
 
   return (
     <View
@@ -78,14 +73,17 @@ const BurgerInformation = ({ burger }: Props) => {
           }}>
           {burger.weight}g
         </Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 10,
-            justifyContent: 'center',
-            alignContent: 'center',
-            alignItems: 'center',
-          }}>
+        <Animated.View
+          style={[
+            {
+              flexDirection: 'row',
+              marginTop: 10,
+              justifyContent: 'center',
+              alignContent: 'center',
+              alignItems: 'center',
+            },
+            priceContainerRStyle,
+          ]}>
           <View style={{}}>
             <Text
               style={{
@@ -137,7 +135,7 @@ const BurgerInformation = ({ burger }: Props) => {
             }}
             animatedProps={decimalAnimatedProps}
           />
-        </View>
+        </Animated.View>
       </View>
     </View>
   );
